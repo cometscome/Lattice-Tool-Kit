@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
 project(FortranProject LANGUAGES Fortran)
 
+# Set the default build type to Release if none is specified
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Set optimization flags for Fortran (or replace Fortran with C or CXX as needed)
+set(CMAKE_Fortran_FLAGS_RELEASE "-O2")
+set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g")
+
 # Define source directories
 set(MODULE_DIR "${CMAKE_SOURCE_DIR}/MODULE/")
 set(LIBRARY_DIR "${CMAKE_SOURCE_DIR}/LIBRARY/")
