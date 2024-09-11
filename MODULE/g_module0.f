@@ -1,6 +1,7 @@
 C g_module0.f
 C**********************************************************************C
       MODULE field_g
+         implicit none
 C**********************************************************************C
 *     Module for gauge data structure without gauge bushing.           * 
 C----------------------------------------------------------------------C
@@ -9,6 +10,7 @@ C----------------------------------------------------------------------C
       PRIVATE  NBUSH
       PRIVATE  NXH, NYH, NZH, NTH
       PRIVATE  NDW
+      integer ::NC
 
       parameter( NC=3 )
 
@@ -89,6 +91,7 @@ c----------------------------------------------------------------------c
 c----------------------------------------------------------------------c
       TYPE(g_field1), INTENT(OUT):: a
       TYPE(g_field0), INTENT(IN) :: b
+      integer :: icum,it,ix,iy,iz
 
       icum = 0
       do it = 1, NT
@@ -122,6 +125,7 @@ c----------------------------------------------------------------------c
 c----------------------------------------------------------------------c
       TYPE(g_field0), INTENT(OUT):: a
       TYPE(g_field1), INTENT(IN) :: b
+      integer::icum,it,ix,iy,iz
 
       icum = 0
       do it = 1, NT
@@ -155,6 +159,7 @@ c----------------------------------------------------------------------c
 c----------------------------------------------------------------------c
       TYPE(g_field1), INTENT(IN):: a, b
       TYPE(g_field1) c
+      integer::i
 
       do i = 1, NV
 
@@ -177,6 +182,7 @@ c----------------------------------------------------------------------c
 c----------------------------------------------------------------------c
       TYPE(g_field1), INTENT(IN):: a,b
       TYPE(g_field1) c
+      integer::i
          
       do i = 1, NV
 
@@ -200,6 +206,8 @@ c----------------------------------------------------------------------c
       INTEGER, INTENT(IN):: nu
       TYPE(g_field0), INTENT(IN):: a
       TYPE(g_field1) b
+      integer::ieo
+      integer::mu,it,icum,it1,iz,iz1,iy,iy1,ix,ix1
 
       integer idel(4)
 
@@ -260,6 +268,8 @@ c----------------------------------------------------------------------c
       TYPE(g_field1) b
 
       integer idel1(4), idel2(4)
+      integer::ieo
+      integer::mu,it,icum,it1,iz,iz1,iy,iy1,ix,ix1 ,jeo     
 
 c     ....  Stop for the exceptional case   ...
 *     if( (dir%x.ne.0) .and. (dir%y.ne.0) )  then
@@ -344,9 +354,12 @@ c----------------------------------------------------------------------c
       TYPE(ivec3),   INTENT(IN):: dir
       TYPE(g_field0), INTENT(IN):: a
       TYPE(g_field1) b
+      integer :: MASK1
 
       parameter(MASK1=1)
       integer idel1(4), idel2(4), idel3(4)
+      integer::ieo
+      integer::mu,it,icum,it1,iz,iz1,iy,iy1,ix,ix1,jeo
 
       if((dir%x==0) .and. (dir%y==0) .and. (dir%z==0))  then
          b = a
@@ -448,6 +461,7 @@ c     c = a*b                             written by AN 28 March 2000
 c----------------------------------------------------------------------c
       TYPE(g_field1), INTENT(IN):: a, b
       TYPE(g_field1) c 
+      integer::i
       
       do i = 1, NV
 
@@ -493,7 +507,8 @@ c----------------------------------------------------------------------c
       REAL*8, INTENT(IN)::s
       TYPE(g_field1), INTENT(IN):: a
       TYPE(g_field1) b 
-      
+      integer::i
+
       do i = 1, NV
 
          b%g(1,1,i) = s * a%g(1,1,i)
@@ -518,6 +533,7 @@ c----------------------------------------------------------------------c
       COMPLEX*16, INTENT(IN)::c
       TYPE(g_field1), INTENT(IN):: a
       TYPE(g_field1) b 
+      integer::i
       
       do i = 1, NV
 
@@ -540,6 +556,7 @@ c----------------------------------------------------------------------c
 c----------------------------------------------------------------------c
       TYPE(g_field1), INTENT(IN):: a, b
       TYPE(g_field1) c 
+      integer::i,j
 
       do i = 1,NV
 c
@@ -591,6 +608,7 @@ c      c = a_adj * b
 c----------------------------------------------------------------------c
       TYPE(g_field1), INTENT(IN):: a, b
       TYPE(g_field1) c 
+      integer::i
 
       do i = 1, NV
 
