@@ -6,11 +6,13 @@ project(FortranProject LANGUAGES Fortran)
 # Detect the Fortran compiler and set flags accordingly
 if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "Intel")
     # Intel Fortran flags for bounds checking
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -check bounds -g -traceback")
+    #set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -check bounds -g -traceback")
 elseif("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")
     # GNU Fortran flags for bounds checking
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fcheck=bounds -g -fbacktrace")
+    #set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fcheck=bounds -g -fbacktrace")
 endif()
+
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O3")
 
 # Set optimization flags for Fortran (or replace Fortran with C or CXX as needed)
 #set(CMAKE_Fortran_FLAGS_RELEASE "${CMAKE_Fortran_FLAGS_RELEASE} -O2")
@@ -67,5 +69,5 @@ add_executable(a.out
 set_target_properties(a.out PROPERTIES Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/modules")
 
 
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -check bounds -warn all -g -traceback -O0")
+#set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -check bounds -warn all -g -traceback -O0")
 #set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g -O0 -check all -fpe0 -traceback -warn all -debug extended -init=snan,arrays,zero -check uninit")
