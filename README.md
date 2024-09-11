@@ -68,3 +68,5 @@ So, you can do the HMC like
 ```
 ./a.out < ../HMCwithClover/input
 ```
+
+*note* Now intel fortran is not suppoterd. Only gfortran is supported. 
