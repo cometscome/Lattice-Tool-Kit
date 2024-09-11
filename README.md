@@ -6,6 +6,10 @@ But it takes a lot of time and energy to construct the lattice QCD code from scr
 
 The copyright is GNU GPL(General Public License). 
 
+# Modified version
+I made CMakeLists.txt to use cmake. 
+I revised codes. 
+
 # How to use 
 To use the HMC simulation, the procedure is as follows.
 ```
