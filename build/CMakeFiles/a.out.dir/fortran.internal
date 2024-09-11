@@ -1,8 +1,0 @@
-# The fortran modules provided by this target.
-provides
- aniso.mod
- debug1.mod
- field_f.mod
- field_g.mod
- fpara.mod
- hmc_mod.mod
