@@ -18,8 +18,8 @@ c-----------------------------------------------------c
 
       Direction: do mu = 1, 4
 
-*        call make_staple(u,staple,mu)   ! Staple for Wilson action
-         call make_istaple(u,staple,mu)  ! Staple for Improved action
+         call make_staple(u,staple,mu)   ! Staple for Wilson action
+*        call make_istaple(u,staple,mu)  ! Staple for Improved action
 
          tmp1 = u(mu)         !  tmp1 
 c
@@ -133,7 +133,6 @@ c     ...  Fill boundaries
         ! ...   Projection onto Lie Algebra   ...
         call  projlink(tmp2,tmp3,NV)
         call  algblink(tmp3,c,NV)
-
         ! ...  p(new) = p(old) + fac * c  .....
 *       p(mu) = p(mu) + ((factor*hopp(mu)*dtau)*c)
         p(mu) = p(mu) + ((factor*dtau)*c)

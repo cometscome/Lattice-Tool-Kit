@@ -17,6 +17,7 @@ C     include '../INCLUDE/para.h'
 
       REAL*8  plaq,plaqsum
       COMPLEX*16  Pol(3,3,NX,NY,NZ), avePol
+      myrank = 0
 
 
 c     ...............................................
@@ -104,6 +105,7 @@ c     ...  Molecular Dynamics Initialization  ...
 
 c     ...  Solve W^dagger*eta = phi
 
+*     if(fermions) call cg0(eta,phi,eps,imax,2)
       if(fermions) call cg0(eta,phi,2)
 
       return
@@ -181,17 +183,15 @@ c--------------------------------------------------------------c
       real*8  e, eym
       real*8  ek, epf
 
-*     call  ymaction(eym)
-      call iymaction(eym)
+      call ymaction(eym)
       ek = (p(1)*p(1)) + (p(2)*p(2)) + (p(3)*p(3)) + (p(4)*p(4)) 
       ek = 0.5d0 * ek
       e = ek - eym * beta / float(NTRACE) 
 
       if (fermions)  e = e + (eta*eta)
 
-      WRITE(*,'(a,5(2x,e15.7))') " 0.5*ek,-eym*beta/N, eta**2:",
-     &            0.5d0*ek, -eym*beta/float(NTRACE),(eta*eta)
-
+*     WRITE(*,'(a,5(2x,e15.7))') " 0.5*ek,-eym*beta/N, eta**2:",
+*    &            0.5d0*ek, -eym*beta/float(NTRACE),(eta*eta)
       return
       end
 
@@ -347,153 +347,3 @@ C     ENDIF
          
       RETURN
       END
-
-c--------------------------------------------------------------------c
-      subroutine  iymaction (s)
-c--------------------------------------------------------------------c
-c
-c     Calculate YangMils action for improved action
-c          (here 1x1 + 1x2) 
-c     c0 : coefficient of 1x1
-c     c1 : coefficient of 1x2
-c      PARAMETER ( c0=6.1564, c1=(-0.6241) )
-c
-c------------------------------------------------------------------c
-c
-c    +------+    +------+------+  
-c    |      |    |             |  
-c    |      |    |             |  
-c    +      +    +      +------+   
-c                                 
-c     type 1      type 3
-c
-c     +------+ 
-c     |      | 
-c     |      | 
-c     +      + 
-c     |      | 
-c     |      | 
-c     +      +  
-c    
-c      type 7       
-c                    
-c-----------------------------------------------------------------c
-      USE field_g
-      include '../INCLUDE/para_geometry'
-      parameter( NTRACE=3 )
-      REAL*8, INTENT(OUT) :: s     ! YM action
-
-      TYPE(g_field0) u(4)
-      common/ config/ u
-
-      TYPE(g_field1)  staple, temp1, temp2, temp3
-      TYPE(ivec2)    idir2
-      REAL*8 trace(NV)
-c
-      REAL*8  c0, c1
-*     PARAMETER ( c0=1.0d0, c1=0.0d0 )
-      PARAMETER ( c0=3.648d0, c1=(-0.331d0) )
- 
-      s = 0.d0
- 
-c-------------------------------------------------------------------c
-c     ordinary Wilson part
-c-------------------------------------------------------------------c
-
-      Direction1 : DO mu = 1, 3
-
-      call set_zero(staple)
-
-      Direction2 : DO nu = mu+1, 4
-      
-c       x+nu temp2
-c        .---------.
-c        I         I
-c  temp1 I         I
-c        I         I
-c        .         .
-c        x        x+mu
-
-         temp1 = u(nu)
-         temp2 = nu.gshift.u(mu)
-         temp3 = temp1 * temp2
-         temp1 = mu.gshift.u(nu)
-         temp3 = temp3.prodAD.temp1
-
-         staple = staple + (c0*temp3)
-
-c-------------------------------------------------------------------c
-c
-c     additional term for improved action
-c
-c-------------------------------------------------------------------c
-c      x+nu
-c       +------+------+ 
-c       |             | 
-c       |             | 
-c       +      +------+    clockwise manner 
-c       x     x+mu
-c    type 3      
-
-         temp1 = u(nu)
-         temp2 = nu.gshift.u(mu)
-         temp3 = temp1 * temp2
-
-         idir2 = ivec2(mu,nu)
-         temp1 = idir2.gshift.u(mu)
-         temp3 = temp3*temp1
-
-         idir2 = ivec2(mu,mu)
-         temp1 = idir2.gshift.u(nu)
-         temp3 = temp3.prodAD.temp1
-
-         temp1 = mu.gshift.u(mu)
-         temp3 = temp3.prodAD.temp1
-
-         staple = staple + (c1*temp3)
-
-c-------------------------------------------------------------------c
-c     x+2nu   x+nu+nu+mu         
-c       +------+ 
-c temp2 |      | 
-c       |      | 
-c   x+nu+      + x+mu+nu
-c       |      | 
-c temp1 |      | 
-c       +      + 
-c       x      x+mu       clockwise
-c
-c  type 7  
-c
-         temp1 = u(nu)
-         temp2 = nu.gshift.u(nu)
-         temp3 = temp1 * temp2
-
-         idir2 = ivec2(nu,nu)
-         temp1 = idir2.gshift.u(mu)
-         temp3 = temp3*temp1
-
-         idir2 = ivec2(nu,mu)
-         temp1 = idir2.gshift.u(nu)
-         temp3 = temp3.prodAD.temp1
-
-         temp1 = mu.gshift.u(nu)
-         temp3 = temp3.prodAD.temp1
-
-         staple = staple + (c1*temp3)
-
-      ENDDO Direction2 
-
-      temp1 = u(mu)
-      call tracev (temp1,staple,trace,0)
-
-      Site : do i = 1,NV
-        s = s + trace(i)
-      enddo Site
-
-      ENDDO Direction1 
-
-*     print *,"Plaq (iymaction): ", s / DBLE(NV*(3*2)*NTRACE)
-
-      return
-      end

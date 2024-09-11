@@ -411,18 +411,20 @@ c-----------------------------------------------------c
       parameter( PI=3.141592653589793238d0, PI2=PI*2.d0) ! PI2=PI*2
       real*8 granf(nv), variance
       real*8 rho, theta
+      integer::idummy
+      idummy = 0
 
       nvh = nv / 2
       do i = 1, nvh
-        rho = sqrt(-2. * alog(ranf()) * variance)
-        theta = PI2 * ranf()
+        rho = sqrt(-2. * alog(ranf(idummy)) * variance)
+        theta = PI2 * ranf(idummy)
         granf(i      ) = rho * cos(theta)
         granf(i + nvh) = rho * sin(theta)
       enddo
 
       if (2 * nvh .eq. nv) return
-      granf(nv) = sqrt(-2. * alog(ranf()) * variance) 
-     &          * cos(PI2 * ranf())
+      granf(nv) = sqrt(-2. * alog(ranf(idummy)) * variance) 
+     &          * cos(PI2 * ranf(idummy))
 
       return
       end

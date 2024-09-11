@@ -5,8 +5,8 @@
       parameter( NX=4, NY=4, NZ=4, NT=4 )
       parameter( NV=NX*NY*NZ*NT, NVH=NV/2 )
       parameter( NXH=NX/2, NYH=NY/2, NZH=NZ/2, NTH=NT/2 )
-      parameter( NBUSH=32 )       
-      parameter( NDW=2 )        
+      parameter( NBUSH=1 )       
+      parameter( NDW=1 )        
 
 ! NX, NY, NZ, NT     : Lattice size
 ! NBUSH              : No. of Bush = Even/Odd of Hypercube * No. of links 

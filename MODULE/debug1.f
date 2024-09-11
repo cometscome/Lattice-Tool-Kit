@@ -16,7 +16,8 @@ C----------------------------------------------------------------------C
 
 
       TYPE adumy
-         REAL*8, DIMENSION(8,NV,4) :: a
+         !REAL*8, DIMENSION(8,NV,4) :: a
+         REAL*8, DIMENSION(8,4,NV) :: a
       END TYPE
 
       TYPE fdumy
