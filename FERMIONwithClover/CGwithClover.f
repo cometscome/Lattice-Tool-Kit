@@ -2,6 +2,7 @@ c cg.f
 c----------------------------------------------------------------------
 *     subroutine  cg0 (x,b,eps,imax,iflag)  ! Changed on Jan.7, 2006
       subroutine  cg0 (x,b,iflag)
+      
 c-----------------------------------------------------------------------
 c     this routine  solves
 c                  W(u) * x = b      for iflag=1
@@ -14,6 +15,7 @@ c     terminated.
 c----------------------------------------------------------------------
       USE field_f
       USE fpara             ! Added on Jan.7, 2006
+      implicit none
       TYPE(g_field0) U(4)   ! Added on Jan.7, 2006
       common/ config/ U     ! Added on Jan.7, 2006
 c      include 'mpif.h'                                                ! MPI
@@ -23,6 +25,9 @@ c      include '../INCLUDE/para.h'                                     ! MPI
 *     REAL*8 eps
       TYPE(f_field) wxvect, x, b, res, p, q, s
       REAL*8 alpha, beta, c1, c2, c3
+      integer::icheck,iflag,idone,i
+      real*8 ::rnorm
+      integer::myrank
 
       data icheck/ 1/
 
@@ -127,7 +132,10 @@ c-------------------------------------------------------------------------c
       TYPE(f_field), INTENT(IN) :: x
       TYPE(f_field) x5
       COMPLEX*16 fac1, fac2  ! added by A.N. on 2008/6/24
-
+      integer::mu
+      !write(*,*) zero_f%f 
+      !write(*,*) "wxvect" ,ubound(temp%f,1),ubound(zero_f%f,1)
+      !temp%f  = zero_f%f
       temp  = zero_f
 
       if (iflag == 1) then           ! y = x

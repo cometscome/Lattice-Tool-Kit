@@ -1,14 +1,21 @@
 cmake_minimum_required(VERSION 3.10)
 project(FortranProject LANGUAGES Fortran)
 
-# Set the default build type to Release if none is specified
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
+
+
+# Detect the Fortran compiler and set flags accordingly
+if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "Intel")
+    # Intel Fortran flags for bounds checking
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -check bounds -g -traceback")
+elseif("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")
+    # GNU Fortran flags for bounds checking
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fcheck=bounds -g -fbacktrace")
 endif()
 
 # Set optimization flags for Fortran (or replace Fortran with C or CXX as needed)
-set(CMAKE_Fortran_FLAGS_RELEASE "-O2")
-set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g")
+#set(CMAKE_Fortran_FLAGS_RELEASE "${CMAKE_Fortran_FLAGS_RELEASE} -O2")
+##set(CMAKE_Fortran_FLAGS_DEBUG "${CMAKE_Fortran_FLAGS_DEBUG} -O0 -g")
+
 
 # Define source directories
 set(MODULE_DIR "${CMAKE_SOURCE_DIR}/MODULE/")
@@ -19,7 +26,7 @@ set(HMCwithClover_DIR "${CMAKE_SOURCE_DIR}/HMCwithClover/")
 set(GAUGE_DIR "${CMAKE_SOURCE_DIR}/GAUGE/")
 
 # Specify the Fortran compiler
-set(CMAKE_Fortran_COMPILER gfortran)
+#set(CMAKE_Fortran_COMPILER gfortran)
 
 # Define include directories
 include_directories(${INCLUDE_DIR})
@@ -59,3 +66,6 @@ add_executable(a.out
 # Add custom compilation flags if necessary (adjust as needed)
 set_target_properties(a.out PROPERTIES Fortran_MODULE_DIRECTORY "${CMAKE_BINARY_DIR}/modules")
 
+
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -check bounds -warn all -g -traceback -O0")
+#set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g -O0 -check all -fpe0 -traceback -warn all -debug extended -init=snan,arrays,zero -check uninit")

@@ -6,6 +6,7 @@ C     module for HMC
 C----------------------------------------------------------------------C
       USE field_g
       USE field_f
+      implicit none
       PRIVATE u0
       PRIVATE temp, temp1, temp2, temp3 
 
@@ -14,6 +15,7 @@ C----------------------------------------------------------------------C
       PRIVATE  NBUSH
       PRIVATE  NXH, NYH, NZH, NTH
       PRIVATE  NDW
+      integer::NDFALG
 
       parameter( NDFALG=8 )
 
@@ -61,6 +63,7 @@ c     z = x + y
 c----------------------------------------------------------------------c
       TYPE(a_field), INTENT(IN):: x, y
       TYPE(a_field) z
+      integer::k,i
 
       do k = 1, NDFALG
       do i = 1, NV
@@ -77,6 +80,7 @@ c     z = x - y
 c----------------------------------------------------------------------c
       TYPE(a_field), INTENT(IN):: x, y
       TYPE(a_field) z
+      integer::k,i
 
       do k = 1, NDFALG
       do i = 1, NV
@@ -94,6 +98,7 @@ c----------------------------------------------------------------------c
       REAL*8, INTENT(IN) :: s
       TYPE(a_field), INTENT(IN):: x
       TYPE(a_field) y
+      integer::k,i
 
       do k = 1, NDFALG
       do i = 1, NV
@@ -111,6 +116,7 @@ c----------------------------------------------------------------------c
       COMPLEX*16, INTENT(IN) :: c
       TYPE(a_field), INTENT(IN):: x
       TYPE(a_field) y
+      integer::k,i
 
       do k = 1, NDFALG
       do i = 1, NV
@@ -127,6 +133,7 @@ c     s = x*y
 c----------------------------------------------------------------------c
       TYPE(a_field), INTENT(IN):: x, y
       REAL*8 s,ssum
+      integer::k,i
 
       s = 0.d0
       do k = 1, NDFALG

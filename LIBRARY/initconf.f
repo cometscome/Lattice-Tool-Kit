@@ -18,6 +18,7 @@ c----------------------------------------------------------------------c
 
 c     .....  prepare for the random numbers   .....
       if((istart==1).or.(istart==2))  then
+        myrank = 0
          ndelay = 1 + myrank
          call cinit3(ndelay) 
       endif

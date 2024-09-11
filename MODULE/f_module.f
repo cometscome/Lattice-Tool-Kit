@@ -4,12 +4,14 @@ C**********************************************************************C
 c                                    written by AN on May 25, 2000 
 c----------------------------------------------------------------------c
       USE field_g
+      implicit none
 
       include '../INCLUDE/para_geometry'
       PRIVATE  NX, NY, NZ, NT, NV, NVH
       PRIVATE  NBUSH
       PRIVATE  NXH, NYH, NZH, NTH
       PRIVATE  NDW
+      integer::NDIM_F
 
       parameter( NDIM_F=NC*(NX+2)*(NY+2)*(NZ+2)*(NT+2)*4 )
  
@@ -26,6 +28,7 @@ c----------------------------------------------------------------------c
              
       TYPE(f_field)  zero_f
       data zero_f%f / NDIM_F*(0.d0,0.d0)/
+      !NDIM_F=NC*(NX+2)*(NY+2)*(NZ+2)*(NT+2)*4
 
       INTERFACE OPERATOR(+)
          MODULE PROCEDURE fadd
@@ -65,6 +68,7 @@ c----------------------------------------------------------------------c
       TYPE(f_field), INTENT(IN):: a, b
       TYPE(f_field) c
       COMPLEX*16  f1, f2, f3
+      integer::mu,it,iz,iy,ix
 
       do mu = 1, 4
 
@@ -96,6 +100,7 @@ c----------------------------------------------------------------------c
       TYPE(f_field), INTENT(IN):: a, b
       TYPE(f_field) c
       COMPLEX*16  f1, f2, f3
+      integer::mu,it,iz,iy,ix
 
 *     WRITE(*,*) "fsub: a, b: ", a%f(1,1,1,1,1,1), b%f(1,1,1,1,1,1)
       do mu = 1, 4
@@ -128,6 +133,7 @@ c----------------------------------------------------------------------c
 c----------------------------------------------------------------------c
       TYPE(f_field), INTENT(IN):: a,b
       COMPLEX*16 c
+      integer::mu,it,iz,iy,ix
 *     COMPLEX*16 csum                             ! MPI
 
       include '../INCLUDE/para_geometry'
@@ -163,6 +169,7 @@ c----------------------------------------------------------------------c
       TYPE(f_field), INTENT(IN) :: a
       TYPE(f_field)  b
       REAL*8, INTENT(IN) :: s
+      integer::mu,it,iz,iy,ix
          
       do mu = 1, 4
 
@@ -192,6 +199,7 @@ c----------------------------------------------------------------------c
       TYPE(f_field), INTENT(IN) :: a
       TYPE(f_field)  b
       COMPLEX*16, INTENT(IN) :: s
+      integer::mu,it,iz,iy,ix
          
       do mu = 1, 4
 
@@ -233,6 +241,7 @@ c----------------------------------------------------------------------c
       COMPLEX*16  e1, e2, e3, e4, f1, f2, f3, f4
 
       INTEGER idel(4)
+      integer:: ialpha,it,it1,iz,iz1,iy,iy1,ix,ix1,ic
 
       if( mu == 0 )  then
          b = a
@@ -446,6 +455,7 @@ c----------------------------------------------------------------------c
       COMPLEX*16  e1, e2, e3, e4, f1, f2, f3, f4
 
       INTEGER idel(4)
+      integer:: ialpha,it,it1,iz,iz1,iy,iy1,ix,ix1,ic
 
       if( mu == 0 )  then
          b = a
