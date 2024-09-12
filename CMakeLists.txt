@@ -30,8 +30,6 @@ set(GAUGE_DIR "${CMAKE_SOURCE_DIR}/GAUGE/")
 # Specify the Fortran compiler
 #set(CMAKE_Fortran_COMPILER gfortran)
 
-# Define include directories
-include_directories(${INCLUDE_DIR})
 
 set(SOURCES 
     ${MODULE_DIR}/g_module0.f
