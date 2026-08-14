@@ -4,7 +4,8 @@ project(FortranProject LANGUAGES Fortran)
 
 
 # Detect the Fortran compiler and set flags accordingly
-if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "Intel")
+if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "Intel" OR
+   "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "IntelLLVM")
     # Intel Fortran flags for bounds checking
     #set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -check bounds -g -traceback")
 elseif("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")

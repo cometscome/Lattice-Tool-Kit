@@ -66,9 +66,13 @@ c----------------------------------------------------------------------c
       FUNCTION fadd(a,b) RESULT(c)
 c----------------------------------------------------------------------c
       TYPE(f_field), INTENT(IN):: a, b
-      TYPE(f_field) c
+      TYPE(f_field), ALLOCATABLE :: c
       COMPLEX*16  f1, f2, f3
       integer::mu,it,iz,iy,ix
+
+c     Allocate field-valued function results on the heap.  Nested
+c     operator expressions otherwise exhaust the default ifx stack.
+      ALLOCATE(c)
 
       do mu = 1, 4
 
@@ -98,9 +102,11 @@ c---------------------------------------------------------------------c
       FUNCTION fsub(a,b) RESULT(c)
 c----------------------------------------------------------------------c
       TYPE(f_field), INTENT(IN):: a, b
-      TYPE(f_field) c
+      TYPE(f_field), ALLOCATABLE :: c
       COMPLEX*16  f1, f2, f3
       integer::mu,it,iz,iy,ix
+
+      ALLOCATE(c)
 
 *     WRITE(*,*) "fsub: a, b: ", a%f(1,1,1,1,1,1), b%f(1,1,1,1,1,1)
       do mu = 1, 4
@@ -167,9 +173,11 @@ c----------------------------------------------------------------------c
 c     scalar (real*8) * Vector
 c----------------------------------------------------------------------c
       TYPE(f_field), INTENT(IN) :: a
-      TYPE(f_field)  b
+      TYPE(f_field), ALLOCATABLE :: b
       REAL*8, INTENT(IN) :: s
       integer::mu,it,iz,iy,ix
+
+      ALLOCATE(b)
          
       do mu = 1, 4
 
@@ -197,9 +205,11 @@ c----------------------------------------------------------------------c
 c     scalar (complex*16) * Vector
 c----------------------------------------------------------------------c
       TYPE(f_field), INTENT(IN) :: a
-      TYPE(f_field)  b
+      TYPE(f_field), ALLOCATABLE :: b
       COMPLEX*16, INTENT(IN) :: s
       integer::mu,it,iz,iy,ix
+
+      ALLOCATE(b)
          
       do mu = 1, 4
 
@@ -231,7 +241,7 @@ c----------------------------------------------------------------------c
       USE fpara
 
       TYPE(f_field), INTENT(IN):: a
-      TYPE(f_field)  b
+      TYPE(f_field), ALLOCATABLE :: b
       INTEGER, INTENT(IN):: mu
 
       TYPE(g_field0) u0(4)
@@ -242,6 +252,8 @@ c----------------------------------------------------------------------c
 
       INTEGER idel(4)
       integer:: ialpha,it,it1,iz,iz1,iy,iy1,ix,ix1,ic
+
+      ALLOCATE(b)
 
       if( mu == 0 )  then
          b = a
@@ -445,7 +457,7 @@ c----------------------------------------------------------------------c
       USE fpara
 
       TYPE(f_field), INTENT(IN):: a
-      TYPE(f_field)  b
+      TYPE(f_field), ALLOCATABLE :: b
       INTEGER, INTENT(IN):: mu
 
       TYPE(g_field0) u0(4)
@@ -456,6 +468,8 @@ c----------------------------------------------------------------------c
 
       INTEGER idel(4)
       integer:: ialpha,it,it1,iz,iz1,iy,iy1,ix,ix1,ic
+
+      ALLOCATE(b)
 
       if( mu == 0 )  then
          b = a

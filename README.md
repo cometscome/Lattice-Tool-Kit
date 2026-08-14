@@ -10,6 +10,56 @@ The copyright is GNU GPL(General Public License).
 I made CMakeLists.txt to use cmake. 
 I revised codes. 
 
+# Changes in this fork (2026-08-14)
+
+This fork fixes several problems that prevented the Wilson HMC program
+from running reliably with optimization and with Intel oneAPI Fortran.
+
+* The random-number initialization no longer relies on signed 32-bit
+  integer overflow.  The original overflow-dependent statements are
+  retained as comments, and the replacement uses 64-bit arithmetic with
+  an explicit modulo `2^32` wraparound.  This fixes invalid random states,
+  NaNs, and CG non-convergence observed with optimization above `-O0`.
+* Large fermion work fields and field-valued operator results use explicit
+  allocatable storage.  In addition, `wxvect` now writes to a caller-owned
+  output field instead of returning a lattice-sized function temporary.
+  These changes avoid overflowing the default process stack without
+  requiring the Intel `-heap-arrays` option or an unlimited stack.
+* The Metropolis test calls the external `ranf` routine with its required
+  dummy argument.  This prevents Intel Fortran from confusing the call
+  with its `RANF` intrinsic and producing an invalid accept/reject result.
+* The serial CG diagnostic rank is initialized to zero instead of printing
+  an undefined value.
+* CMake recognizes both the classic Intel compiler ID (`Intel`) and the
+  oneAPI LLVM compiler ID (`IntelLLVM`).
+
+The clover-free Wilson HMC configuration was tested at `-O3` with
+gfortran 11.5.0 and Intel oneAPI ifx 2025.1.1.  The normal `4x4x4x4`
+input completed four trajectories with both compilers.  Lattice-size
+checks also covered `6x4x4x4`, `4x6x4x4`, `8x6x4x4`, and `12x8x4x4`.
+The `12x8x4x4` case reproduced an ifx stack failure before the temporary-
+storage fix and completed successfully afterward with the default 8 MiB
+stack and without `-heap-arrays`.  GNU bounds checking found no Nx/Ny
+indexing errors in these cases.  These size checks were performed on
+temporary copies; the repository default remains `4x4x4x4`.
+
+Example optimized builds are:
+
+```sh
+cmake -S . -B build-gfortran \
+  -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_BUILD_TYPE=Release
+cmake --build build-gfortran
+
+cmake -S . -B build-ifx \
+  -DCMAKE_Fortran_COMPILER=ifx -DCMAKE_BUILD_TYPE=Release
+cmake --build build-ifx
+```
+
+For ifx, initialize the oneAPI environment (for example by sourcing
+`setvars.sh`) before configuring and running the executable.  The
+clover-free validation used `.false.` for `Clover term` on the third line
+of `HMCwithClover/input`.
+
 # How to use 
 To use the HMC simulation, the procedure is as follows.
 ```
@@ -73,4 +123,5 @@ So, you can do the HMC like
 ./a.out < ../HMCwithClover/input
 ```
 
-*note* Now intel fortran is not suppoterd. Only gfortran is supported. 
+*note* This fork has been tested with gfortran 11.5.0 and Intel oneAPI
+ifx 2025.1.1.  Other compiler versions have not yet been validated.

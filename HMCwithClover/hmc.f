@@ -100,13 +100,17 @@ c-----------------------------------------------------c
       include '../INCLUDE/para_geometry'
       REAL*8 factor
 *     TYPE(f_field)  tmp1
-      TYPE(f_field)  tmp0, tmp1
+      TYPE(f_field), ALLOCATABLE :: tmp0, tmp1
       TYPE(g_field1) tmp2, tmp3
       TYPE(a_field) c, c2
 
       TYPE(g_field0) u(4)
       common/ config/ u
       real*8 plaq
+
+c     Keep the two large spinor work fields off the process stack.
+c     Explicit allocation makes ifx work without -heap-arrays.
+      ALLOCATE(tmp0,tmp1)
 
 c     ...  Solve W^dagger*eta = phi
 *     call cg0(eta,phi,eps,imax,2)

@@ -124,7 +124,7 @@ c--------------------------------------------------------------c
       include '../INCLUDE/para_geometry'
  
       TYPE(g_field0) u(4)
-      TYPE(f_field)  wxvect, gauss_ran_f
+      TYPE(f_field)  gauss_ran_f
       common/ config/ u
 
       REAL*8 pwork(NDFALG,NV), fwork(2,3,NV)
@@ -162,7 +162,7 @@ c--------------------------------------------------------------c
          ENDIF
 
 
-        phi = wxvect(eta,3)   ! phi = W_adj*eta
+        CALL wxvect(phi,eta,3) ! phi = W_adj*eta
         call set_wing_f1(phi)
 
       end if
@@ -264,9 +264,15 @@ c--------------------------------------------------------------c
       common/ config/ u
 
       LOGICAL accept
+      REAL*4 ranf
+      EXTERNAL ranf
 
       call action(enew,eymnew)
-      accept = exp(eold - enew) .ge. ranf()
+*     accept = exp(eold - enew) .ge. ranf()
+c     RANF is an external function with one dummy argument.  Calling it
+c     without that argument can be confused with the Intel RANF
+c     intrinsic and gives an invalid Metropolis decision with ifx.
+      accept = exp(eold - enew) .ge. ranf(idum)
 
       WRITE(*,'(a,3(e15.7,2x),l2)') "Eold,Enew,Diff,accept: ",
      &            eold, enew, eold-enew, accept

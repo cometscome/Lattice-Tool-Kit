@@ -23,13 +23,23 @@ c      include '../INCLUDE/para.h'                                     ! MPI
 
 
 *     REAL*8 eps
-      TYPE(f_field) wxvect, x, b, res, p, q, s
+      TYPE(f_field) x, b
+      TYPE(f_field), ALLOCATABLE :: res, p, q, s
       REAL*8 alpha, beta, c1, c2, c3
       integer::icheck,iflag,idone,i
       real*8 ::rnorm
       integer::myrank
 
       data icheck/ 1/
+
+c     These work vectors are too large for the default ifx stack once
+c     nested field-valued functions add their own temporaries.  Make
+c     their heap storage explicit instead of requiring -heap-arrays or
+c     an unlimited process stack.
+      ALLOCATE(res,p,q,s)
+c     The MPI rank lookup is disabled in this serial source.  Initialize
+c     the diagnostic value instead of printing an undefined integer.
+      myrank = 0
 
       IF( abs(Csw) > 0.001 ) THEN
          CALL MKFmunu(U,hop,Csw)
@@ -38,9 +48,11 @@ c      include '../INCLUDE/para.h'                                     ! MPI
 c     the initial condition  ( for i=0 )
       ! ...  res = b - W*x
       if(iflag==1)  then
-         res = b - wxvect(x,2)
+         CALL wxvect(q,x,2)
+         res = b - q
       else if(iflag==2)  then
-         res = b - wxvect(x,3)
+         CALL wxvect(q,x,3)
+         res = b - q
       endif
 
       rnorm = res * res          ! added on Sept.11, 2012 by AN
@@ -51,9 +63,9 @@ c     the initial condition  ( for i=0 )
 
       ! ...  p = W_adj * res
       if(iflag==1)  then
-         p = wxvect(res,3)
+         CALL wxvect(p,res,3)
       else if(iflag==2)  then
-         p = wxvect(res,2)
+         CALL wxvect(p,res,2)
       endif
 
 c
@@ -66,9 +78,9 @@ c
 
         ! ...  q = W * p
         if(iflag==1)  then
-           q = wxvect(p,2)
+           CALL wxvect(q,p,2)
         else if(iflag==2)  then
-           q = wxvect(p,3)
+           CALL wxvect(q,p,3)
         endif
 
         ! ...  c2 = < q | q >
@@ -96,9 +108,9 @@ c       .....   check of the convergence   ...............
 
         ! ...  s = W_adj * res 
         if(iflag==1)  then
-           s = wxvect(res,3)
+           CALL wxvect(s,res,3)
         else if(iflag==2)  then
-           s = wxvect(res,2)
+           CALL wxvect(s,res,2)
         endif
 
         c3 = s * s
@@ -120,19 +132,23 @@ c
       end
 
 c-------------------------------------------------------------------------c
-      FUNCTION wxvect(x,iflag)
+      SUBROUTINE wxvect(y,x,iflag)
 c-------------------------------------------------------------------------c
-c     wxvect = x        for iflag=1                                       c
-c              Wx                 2                                       c
-c              (W_adj)x           3                                       c
+c     y = x        for iflag=1                                             c
+c         Wx                 2                                             c
+c         (W_adj)x           3                                             c
 c-------------------------------------------------------------------------c
       USE field_f
       USE fpara
-      TYPE(f_field)  wxvect
+      TYPE(f_field), INTENT(OUT) :: y
       TYPE(f_field), INTENT(IN) :: x
-      TYPE(f_field) x5
+      TYPE(f_field), ALLOCATABLE :: x5
       COMPLEX*16 fac1, fac2  ! added by A.N. on 2008/6/24
       integer::mu
+c     Returning f_field as a function value makes ifx create another
+c     lattice-sized temporary on the default stack.  Write directly to
+c     the caller-provided field so no hidden return-value array is made.
+      ALLOCATE(x5)
       !write(*,*) zero_f%f 
       !write(*,*) "wxvect" ,ubound(temp%f,1),ubound(zero_f%f,1)
       !temp%f  = zero_f%f
@@ -140,7 +156,7 @@ c-------------------------------------------------------------------------c
 
       if (iflag == 1) then           ! y = x
 
-         wxvect = x
+         y = x
 
       else if (iflag == 2) then      ! y = Wx 
 
@@ -154,10 +170,10 @@ c-------------------------------------------------------------------------c
 
          enddo
 
-         wxvect =  x - temp
+         y =  x - temp
 
          IF( abs(Csw) > 0.001 ) THEN
-           CALL vclover(wxvect,x)
+           CALL vclover(y,x)
          ENDIF
       
       else if (iflag == 3) then      ! y = (W_adj)x
@@ -197,12 +213,12 @@ c-------------------------------------------------------------------------c
            CALL vclover(temp3,x5)
          ENDIF
 
-         call g5xvect(wxvect,temp3)
+         call g5xvect(y,temp3)
 
       end if
       
       return
-      end function
+      end
 
 c--------------------------------------------------------------------------c
       subroutine g5xvect(y,x)

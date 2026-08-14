@@ -23,27 +23,42 @@ c----------------------------------------------------------------------c
       parameter( MACRM= 40, MACRI=1)
       COMMON /crand/ iw(0:IP-1), jr, kr
       INTEGER ib(0:IP-1)
+      INTEGER*8 ix64, iwork64, MOD32
+      PARAMETER( MOD32=4294967296_8 )
 
-      ix=MACRI
+*     ix=MACRI
+      ix64=MACRI
 
       DO i = 0, IP-1
-        ix=ix*69069
-        ib(i)=ishft(ix,-31)
+*       ix=ix*69069
+c       The original expression above relies on signed INTEGER*4
+c       overflow.  At optimization levels above -O0 that overflow is
+c       undefined, so compilers may produce an invalid random state.
+c       Use INTEGER*8 arithmetic and explicitly apply the intended
+c       32-bit wraparound instead.
+        ix64=MODULO(ix64*69069_8,MOD32)
+        ib(i)=INT(ISHFT(ix64,-31))
       ENDDO
 
       jr=0
       kr=IP-IQ
       do 30 j=0,IP-1
-        iwork=0
+*       iwork=0
+        iwork64=0_8
         do 20 i=0,31
-          iwork=iwork*2+ib(jr)
+*         iwork=iwork*2+ib(jr)
+c         Building a 32-bit word in signed INTEGER*4 can overflow as
+c         well.  Accumulate it in INTEGER*8, then shift it into the
+c         nonnegative 31-bit state used by the generator.
+          iwork64=iwork64*2_8+INT(ib(jr),8)
           ib(jr)= IEOR(ib(jr),ib(kr))
           jr=jr+1
           if (jr.eq.IP) jr=0
           kr=kr+1
           if (kr.eq.IP) kr=0
    20   continue
-        iw(j)=ishft(iwork,-1)
+*       iw(j)=ishft(iwork,-1)
+        iw(j)=INT(ISHFT(iwork64,-1))
    30 continue
 
       END
